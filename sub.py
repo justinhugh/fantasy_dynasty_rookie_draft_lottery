@@ -8,8 +8,12 @@ import pandas as pd
 
 # Function to write introductory text at start of the program.
 def Intro_blurb():
-    print('\n\nThis is a script that will help you create a draft order for a '
-    'fantasty dynasty draft, using lottery odds for the primary picks.\n')
+    '''
+    Prints the initial text to introduce the purpose of this script.
+    '''
+    print('\n\n_-+=JUSTIN\'S MAGICAL LOTTERY DRAFT TOOL=+-_'
+    '\n\nThis is a script that will help you create a draft order for a '
+    'fantasty dynasty draft, using lottery odds for the primary picks.\n\n')
 
 # Function to ask for the details of the league.
 def Request_context():
@@ -35,10 +39,10 @@ def Request_context():
         try:
             num_teams = int(response)
         except ValueError:
-            print("You did not enter an integer between 1 and 30, try again")
+            print("\n!!!You did not enter an integer between 1 and 30, try again")
             continue
         if num_teams > 30 or num_teams < 1:
-            print("You did not enter an integer between 1 and 30, try again")
+            print("\n!!!You did not enter an integer between 1 and 30, try again")
     league_info['num_teams'] = num_teams
 
     print('\nYour league has', league_info['num_teams'],'teams')
@@ -50,16 +54,15 @@ def Request_context():
         try:
             num_lot = int(response)
         except ValueError:
-            print("You did not enter an integer between 1 and",
+            print("\n!!!You did not enter an integer between 1 and",
             str(league_info['num_teams']) + ", try again")
             continue
         if num_lot > league_info['num_teams'] or num_lot < 1:
-            print("You did not enter an integer between 1 and",
+            print("\n!!!You did not enter an integer between 1 and",
             str(league_info['num_teams']) + ", try again")
     league_info['num_lot'] = num_lot
 
-    print('\nYour league has', league_info['num_lot'],'lottery picks to draw'
-    '\n')
+    print('\nYour league has', league_info['num_lot'],'lottery picks to draw')
 
     # 3- Get the number of teams in lottery
     num_lot_teams = 0
@@ -69,7 +72,7 @@ def Request_context():
         try:
             num_lot_teams = int(response)
         except ValueError:
-            print("You did not enter an integer between", league_info['num_lot']
+            print("\n!!!You did not enter an integer between", league_info['num_lot']
                 +1, "and",
             str(league_info['num_teams']) + ", try again")
             continue
@@ -77,13 +80,13 @@ def Request_context():
                 num_lot_teams > league_info['num_teams'] or
                 num_lot_teams < league_info['num_lot'] +1
             ):
-            print("You did not enter an integer between", league_info['num_lot']
+            print("\n!!!You did not enter an integer between", league_info['num_lot']
                 +1, "and",
             str(league_info['num_teams']) + ", try again")
     league_info['num_lot_teams'] = num_lot_teams
 
     print('\nYour league has', league_info['num_lot_teams'],'teams eligible'
-    ' for the lottery\n')
+    ' for the lottery')
 
     # 4 - Get base odds for lottery.
 
@@ -96,8 +99,6 @@ def Request_context():
     for i in range(league_info['num_lot_teams']):
         league_info['base_odds'][league_info['num_teams']-i] = int(list.pop(0))
 
-    print(league_info)
-
     # 5 - Get the number of teams to win consolation odds (prizes)
     num_prizes = 0
     while True:
@@ -106,14 +107,14 @@ def Request_context():
         try:
             num_prizes = int(response)
         except ValueError:
-            print("You did not enter an integer between 0 and",
+            print("\n!!!You did not enter an integer between 0 and",
             str(league_info['num_lot_teams']) + ", try again")
             continue
         if (
                 num_prizes > league_info['num_lot_teams'] or
                 num_prizes < 0
             ):
-            print("You did not enter an integer between", league_info['num_lot']
+            print("\n!!!You did not enter an integer between", league_info['num_lot']
                 +1, "and",
             str(league_info['num_teams']) + ", try again")
 
@@ -124,21 +125,19 @@ def Request_context():
                 break
 
     print('\n', league_info['num_prizes'],'teams will have their odds '
-        'improved\n')
+        'improved')
 
     # 6 - Get the size of the odds prizes
 
     response = input(('\nEnter the prize odds for the top' + " "
         + str(league_info['num_prizes']) + ' teams of the consolation'
-        'tournament. Start from first'
-        'place, and separate the odds with a comma.\n>>>: '))
+        ' tournament. Start from first'
+        ' place, and separate the odds with a comma.\n>>>: '))
 
     list = response.split(",")
 
     for i in range(league_info['num_prizes']):
         league_info['prizes'][i+1] = int(list.pop(0))
-
-    print(league_info)
 
     # 7 - Get Results of Consolation
     response = input(('\nEnter the ' + str(league_info['num_prizes']) +
@@ -151,8 +150,6 @@ def Request_context():
     for i,j in zip(range(1, league_info['num_prizes']+1), list):
         league_info['consolation_results'][i] = int(j)
 
-    print(league_info)
-
     # 7 - Adjust odds according to consolation
 
     # create a copy of base odds dictionary to adjust with the winnings
@@ -162,6 +159,21 @@ def Request_context():
     for i in league_info['consolation_results']:
         league_info['adjusted_odds'][league_info['consolation_results'][i]] += (
             league_info['prizes'][i])
-    print('\n\n\nadjusted odds:\n')
-    print(league_info)
+
     # # 8 - Get names of all Teams
+    return league_info
+
+# Function to summarize details of the league.
+def Detail_summary(league_info):
+    '''
+    Prints a summary of the provided information, and asks if the user wants to
+    re-enter the details.
+    '''
+
+    print('\nThanks for entering those details. Let\'s summarize what you told'
+    ' us:\n\n'
+    'Number of teams in your league: ', league_info['num_teams'],'\n'
+    'Number of lottery picks: ', league_info['num_lot'],'\n'
+    'Number of lottery-eligible teams: ', league_info['num_lot_teams'],'\n'
+    'Summary of lottery odds: ', league_info['adjusted_odds']
+        )

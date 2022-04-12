@@ -7,7 +7,8 @@ continue_var = True
 
 # Print text to introduce user to purpose of program.
 sub.Intro_blurb()
-sub.Request_context()  
+glob_league_info = sub.Request_context()
+sub.Detail_summary(glob_league_info)
 #
 # while continue_var == True:
 #
