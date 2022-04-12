@@ -7,8 +7,15 @@ continue_var = True
 
 # Print text to introduce user to purpose of program.
 sub.Intro_blurb()
-glob_league_info = sub.Request_context()
-sub.Detail_summary(glob_league_info)
+
+# Loop through asking for details until the user accepts them.
+response=''
+while response!='y':
+
+    glob_league_info = sub.Request_context()
+    sub.Detail_summary(glob_league_info)
+
+    response = input('\n\nAre these details correct? (y/n):')
 #
 # while continue_var == True:
 #
