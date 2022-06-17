@@ -1,6 +1,5 @@
 # import helper functions from file sub.py, along with functions for randomness.
 import sub
-import random
 
 # Initiate boolean, indicating whether program should restart.
 continue_var = True
@@ -14,65 +13,31 @@ while response!='y':
 
     glob_league_info = sub.Request_context()
     sub.Detail_summary(glob_league_info)
+    input("")
 
-    response = input('\n\nAre these details correct? (y/n):')
-#
-# while continue_var == True:
-#
-#     # Get the user's input for league info
-#     requested_prompt = sub.Request_prompt_type()
-#
-#     # Print confirmation of selection
-#     sub.Print_prompt_selection(requested_prompt)
-#
-#
-#     # collect number of teams
-#
-#     # collect number of lottery slots
-#
-#     # collect lots per team for regular season
-#
-#     # collect bonus odds for consolation
-#
-#     # collect names of teams
-#
-#     # collect ranking (overall)
-#
-#     # collect result of consolation
-#
-#     # draw lots & assign order
-#
-#     # display order
-#
-#
-#
-#
-#
-#     # Read the corresponding text file, get list of strings
-#     # Initialize a switch statement, which gives the correct function to use.
-#
-#     # Create the appropriate list of prompts
-#
-#     # If single type, run Read_from_file function.
-#     if requested_prompt != 'all':
-#         prompt_list = sub.Read_from_file(requested_prompt)
-#         print('\nHere is your random', requested_prompt, ':\n')
-#         # Return random string from list
-#         print(prompt_list[random.randrange(0,len(prompt_list))])
-#     else:
-#         prompt_list = sub.Read_all()
-#         for each in prompt_list:
-#             print('\nHere is your random', each, ':\n')
-#             # Return random string from list
-#             print(prompt_list[each][random.randrange(0,len(prompt_list[each]))])
-#
-#     # Return to start of program
-#     continue_response = ''
-#
-#     while continue_response not in ('yes', 'no'):
-#         continue_response = input('\nWould you like another prompt? enter "yes"'
-#                                   'or "no"\n>>>:')
-#
-#     if continue_response == 'no':
-#         continue_var = False
-#         sub.Thanks_for_using()
+    # Draw until the user enters 'n'
+    inner=''
+    while inner !='n':
+
+        # Get and set a random seed from user
+        seed = input('\n\nInput an integer as a random seed:')
+        sub.random.seed(seed)
+
+        # Conduct a draw
+        result = sub.Draw(glob_league_info)
+
+        # Let user spoil the results
+        spoil = input("\n\nShould we show you the results of the draw? (y/n): ")
+
+        # Spoil the results or not based on input
+        if spoil == 'y':
+            print('\n\nThe draft order is:\n',result)
+
+        # Let the user redraw
+        inner = input('\n\nDraw again? (y/n):')
+        print('\n\n')
+
+    sub.Give_names(glob_league_info)
+    sub.Present_drama(sub.Name_list(glob_league_info, result))
+
+    response = input('\n\nWanna exit? (y/n):')

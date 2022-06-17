@@ -4,7 +4,7 @@
 # Import libraries for file navigator.
 import tkinter.filedialog
 import os
-import pandas as pd
+import random
 
 # Function to write introductory text at start of the program.
 def Intro_blurb():
@@ -30,7 +30,9 @@ def Request_context():
         'num_prizes':0,
         'prizes':{},
         'consolation_results':{},
-        'adjusted_odds':{}}
+        'adjusted_odds':{},
+        'draw':[]
+        }
 
     # 1 - Get the number of teams from the user
     num_teams = 0
@@ -124,7 +126,7 @@ def Request_context():
             league_info['num_lot_teams']+1)]:
                 break
 
-    print('\n', league_info['num_prizes'],'teams will have their odds '
+    print('\n' + str(league_info['num_prizes']) +' teams will have their odds '
         'improved')
 
     # 6 - Get the size of the odds prizes
@@ -143,7 +145,7 @@ def Request_context():
     response = input(('\nEnter the ' + str(league_info['num_prizes']) +
         ' teams who placed in the consolation tournament.'
          'Start from first place. Enter the teams\' regular season ranking.'
-         'separate them with a comma.\n>>>: '))
+         ' Separate them with a comma.\n>>>: '))
 
     list = response.split(",")
 
@@ -160,7 +162,11 @@ def Request_context():
         league_info['adjusted_odds'][league_info['consolation_results'][i]] += (
             league_info['prizes'][i])
 
-    # # 8 - Get names of all Teams
+    # Creates the draw, a list of 100 ballots.
+    for value, key in league_info['adjusted_odds'].items():
+        league_info['draw'] += key * [value]
+
+    # 8 - Get names of all Teams
     return league_info
 
 # Function to summarize details of the league.
@@ -176,4 +182,65 @@ def Detail_summary(league_info):
     'Number of lottery picks: ', league_info['num_lot'],'\n'
     'Number of lottery-eligible teams: ', league_info['num_lot_teams'],'\n'
     'Summary of lottery odds: ', league_info['adjusted_odds']
-        )
+    )
+
+# Conduct the draw
+def Draw(league_info):
+
+    # List that will store the draft order
+    li = [i for i in range(league_info['num_teams'],0,-1)]
+
+    # Make a list of numbers already drawn
+    drawn = []
+
+    # Draw the winners until number of drawn teams is num of lottery teams.
+    while len(drawn) < league_info['num_lot']:
+
+        # Make a pick
+        pick = random.choice(league_info['draw'])
+
+        # Skip the rest if we've already drawn this number
+        if pick in drawn:
+            continue
+
+        # Add the picked number to the list of drawn teams
+        drawn.append(pick)
+
+        # Take the drawn number out of the ordered list
+        li.remove(pick)
+
+    # put the drawn numbers at the start of the list
+    result = drawn + li
+
+    return result
+
+# Collect the names of the teams in the league
+def Give_names(league_info):
+
+    league_info['team_names']={}
+
+    for i in range(league_info['num_teams']):
+        name = input(("Enter the name the team that ranked " + (str(i+1)) + ":"))
+
+        league_info['team_names'][i+1] = name
+
+# Make a list in which numbers are replaced by team names
+def Name_list(league_info, li):
+    subs = league_info['team_names']
+    name_li = [subs.get(item,item) for item in li]
+    return name_li
+
+# Present the contents of a list in a dramatic way
+def Present_drama(li):
+    print('\n\n<<<<<<<The results of the lottery are in !!!>>>>>>>\n')
+    input(".")
+    input(".")
+    input(".")
+
+    while li != []:
+        input("")
+        print("\nThe team with pick number ", len(li), " is:")
+        input(".")
+        input(".")
+        input(".")
+        print(li.pop(),'\n\n')
