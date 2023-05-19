@@ -144,7 +144,7 @@ def Request_context():
     # 7 - Get Results of Consolation
     response = input(('\nEnter the ' + str(league_info['num_prizes']) +
         ' teams who placed in the consolation tournament.'
-         'Start from first place. Enter the teams\' regular season ranking.'
+         ' Start from first place. Enter the teams\' regular season ranking.'
          ' Separate them with a comma.\n>>>: '))
 
     list = response.split(",")
@@ -165,8 +165,7 @@ def Request_context():
     # Creates the draw, a list of 100 ballots.
     for value, key in league_info['adjusted_odds'].items():
         league_info['draw'] += key * [value]
-
-    # 8 - Get names of all Teams
+        
     return league_info
 
 # Function to summarize details of the league.
