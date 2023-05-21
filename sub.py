@@ -101,6 +101,9 @@ def Request_context():
     for i in range(league_info['num_lot_teams']):
         league_info['base_odds'][league_info['num_teams']-i] = int(list.pop(0))
 
+    #DEBUG
+    print("DEBUG BASE ODDS:\n", league_info['base_odds'])
+
     # 5 - Get the number of teams to win consolation odds (prizes)
     num_prizes = 0
     while True:
@@ -136,6 +139,8 @@ def Request_context():
         ' tournament. Start from first'
         ' place, and separate the odds with a comma.\n>>>: '))
 
+    # TO ADD: Enforcement that the number of odds entered is appropriate
+    
     list = response.split(",")
 
     for i in range(league_info['num_prizes']):
@@ -149,8 +154,13 @@ def Request_context():
 
     list = response.split(",")
 
+     # TO ADD: Enforcement that the number of teams entered is appropriate
+
     for i,j in zip(range(1, league_info['num_prizes']+1), list):
         league_info['consolation_results'][i] = int(j)
+
+    #DEBUG
+    print("DEBUG CONSOLATION RESULTS:\n", league_info['consolation_results'])
 
     # 7 - Adjust odds according to consolation
 
@@ -162,10 +172,53 @@ def Request_context():
         league_info['adjusted_odds'][league_info['consolation_results'][i]] += (
             league_info['prizes'][i])
 
+    #DEBUG
+    print("DEBUG ADJUSTED ODDS:\n", league_info['adjusted_odds'])
+
     # Creates the draw, a list of 100 ballots.
     for value, key in league_info['adjusted_odds'].items():
         league_info['draw'] += key * [value]
-        
+
+    # LINE TO BE DELETED
+    print(league_info['draw'])
+
+    # 8 - Gets information about penalties applied to teams
+
+    # create a copy of adjusted odds dictionary to now enhance with penalties
+    league_info['penalized_adjusted_odds'] = league_info['adjusted_odds']
+
+    response = input(('\nEnter the regular season rankings of each of the teams who will receive a penalty'
+                      ' for illegal tanking. Separate each number with a comma' 
+                      '.\n>>>: '))
+    
+    list1 = response.split(",")
+
+    response = input(('\nEnter the percentage penalty to be applied, in the same order.'
+                      'Separate each number with a comma' 
+                      '.\n>>>: '))
+
+    list2 = response.split(",")
+
+    #EDIT BELOW
+    for i,j in zip(list1, list2):
+        league_info['penalized_adjusted_odds'][int(i)] -= int(j)
+
+     #DEBUG
+    print("DEBUG PENLIZED ADJUSTED ODDS:\n", league_info['penalized_adjusted_odds'])
+
+    # Recreates the draw, a list of 100 ballots.
+    league_info['draw'] = []
+    for value, key in league_info['penalized_adjusted_odds'].items():
+        league_info['draw'] += key * [value]
+
+    # LINE TO BE DELETED
+    print("DEBUG Penalty adjusted list", league_info['draw'])
+    
+    while(len(league_info['draw'])<100):
+        league_info['draw'] += ['void']
+
+    print("DEBUG Penalty adjusted list with placeholders", league_info['draw'])
+
     return league_info
 
 # Function to summarize details of the league.
@@ -200,6 +253,9 @@ def Draw(league_info):
 
         # Skip the rest if we've already drawn this number
         if pick in drawn:
+            continue
+        if not isinstance(pick, int):
+            print("\nVoid pick drawn!\n")
             continue
 
         # Add the picked number to the list of drawn teams
