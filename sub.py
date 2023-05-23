@@ -11,9 +11,11 @@ def Intro_blurb():
     '''
     Prints the initial text to introduce the purpose of this script.
     '''
-    print('\n\n_-+=JUSTIN\'S MAGICAL LOTTERY DRAFT TOOL=+-_'
-    '\n\nThis is a script that will help you create a draft order for a '
-    'fantasty dynasty draft, using lottery odds for the primary picks.\n\n')
+    print('===================='
+    '\n\nFANTASY NBA DRAFT LOTTERY'
+    '\n\nThis is a python script that will help you conduct a lottery draw for '
+    'draft picks you in your fantasty draft.\n\n'
+    '====================')
 
 # Function to ask for the details of the league.
 def Request_context():
@@ -49,10 +51,10 @@ def Request_context():
 
     print('\nYour league has', league_info['num_teams'],'teams')
 
-    # 2 - Get the number of lottery picks from the user
+    # 2 - Get the number of lottery picks to be awarded from the user
     num_lot = 0
     while num_lot not in [x for x in range(1,league_info['num_teams']+1)]:
-        response = input('\nHow many lottery picks?\n>>>: ')
+        response = input('\nHow many draft picks will be awarded in the lottery?\n>>>: ')
         try:
             num_lot = int(response)
         except ValueError:
@@ -64,7 +66,7 @@ def Request_context():
             str(league_info['num_teams']) + ", try again")
     league_info['num_lot'] = num_lot
 
-    print('\nYour league has', league_info['num_lot'],'lottery picks to draw')
+    print('\nYour league has', league_info['num_lot'],'lottery picks to award')
 
     # 3- Get the number of teams in lottery
     num_lot_teams = 0
@@ -87,24 +89,24 @@ def Request_context():
             str(league_info['num_teams']) + ", try again")
     league_info['num_lot_teams'] = num_lot_teams
 
-    print('\nYour league has', league_info['num_lot_teams'],'teams eligible'
-    ' for the lottery')
+    print('\nYour league has', league_info['num_lot_teams'],'teams eligible to win a lottery pick.')
 
-    # 4 - Get base odds for lottery.
+    # 4 - Get the base odds for lottery. These are the odds before prizes for consolation playoffs.
 
     response = input(('\nEnter the base odds for the' + " "
-        + str(league_info['num_lot_teams']) + ' lottery eligible teams. Start from last'
-        'place, and separate the odds with a comma.\n>>>: '))
+        + str(league_info['num_lot_teams']) + ' lottery eligible teams. These are the odds before prizes'
+        ' have been awarded for the results of consolation playoffs. '
+        'Start from last place, and separate the odds with a comma.\n>>>: '))
 
     list = response.split(",")
 
     for i in range(league_info['num_lot_teams']):
         league_info['base_odds'][league_info['num_teams']-i] = int(list.pop(0))
 
-    #DEBUG
-    print("DEBUG BASE ODDS:\n", league_info['base_odds'])
+    #Print a summary
+    print("\nSummary of Base Odds:\n", league_info['base_odds'])
 
-    # 5 - Get the number of teams to win consolation odds (prizes)
+    # 5 - Get the number of teams to win odds for consolation playoff prizes
     num_prizes = 0
     while True:
         response = input('\nHow many teams will win additional odds?\n>>>: ')
@@ -134,7 +136,7 @@ def Request_context():
 
     # 6 - Get the size of the odds prizes
 
-    response = input(('\nEnter the prize odds for the top' + " "
+    response = input(('\nEnter the odds prizes for the top '
         + str(league_info['num_prizes']) + ' teams of the consolation'
         ' tournament. Start from first'
         ' place, and separate the odds with a comma.\n>>>: '))
@@ -145,6 +147,9 @@ def Request_context():
 
     for i in range(league_info['num_prizes']):
         league_info['prizes'][i+1] = int(list.pop(0))
+
+    #Print a summary
+    print("\nSummary of Odds Prizes:\n", league_info['prizes'])
 
     # 7 - Get Results of Consolation
     response = input(('\nEnter the ' + str(league_info['num_prizes']) +
@@ -159,10 +164,10 @@ def Request_context():
     for i,j in zip(range(1, league_info['num_prizes']+1), list):
         league_info['consolation_results'][i] = int(j)
 
-    #DEBUG
-    print("DEBUG CONSOLATION RESULTS:\n", league_info['consolation_results'])
+    #Print a summary
+    print("\nSummary of Consolation Results:\n", league_info['consolation_results'])
 
-    # 7 - Adjust odds according to consolation
+    # 7 - Adjust odds dictionary according to the results of consolation entered by user
 
     # create a copy of base odds dictionary to adjust with the winnings
     league_info['adjusted_odds'] = league_info['base_odds']
@@ -172,15 +177,15 @@ def Request_context():
         league_info['adjusted_odds'][league_info['consolation_results'][i]] += (
             league_info['prizes'][i])
 
-    #DEBUG
-    print("DEBUG ADJUSTED ODDS:\n", league_info['adjusted_odds'])
+    #Print a summary
+    print("\nSummary of Odds After Awarding Prizes:\n", league_info['adjusted_odds'])
 
     # Creates the draw, a list of 100 ballots.
     for value, key in league_info['adjusted_odds'].items():
         league_info['draw'] += key * [value]
 
-    # LINE TO BE DELETED
-    print(league_info['draw'])
+    # Print a Summary of the draw bag
+    print("\nSummary of the current Draw Bag:\n", league_info['draw'])
 
     # 8 - Gets information about penalties applied to teams
 
@@ -199,25 +204,25 @@ def Request_context():
 
     list2 = response.split(",")
 
-    #EDIT BELOW
     for i,j in zip(list1, list2):
         league_info['penalized_adjusted_odds'][int(i)] -= int(j)
 
-     #DEBUG
-    print("DEBUG PENLIZED ADJUSTED ODDS:\n", league_info['penalized_adjusted_odds'])
+    # Print a Summary of the odds after adjusting for penalties
+    print("\nSummary of Odds After Adjusting for Penalties:\n", league_info['penalized_adjusted_odds'])
 
     # Recreates the draw, a list of 100 ballots.
     league_info['draw'] = []
     for value, key in league_info['penalized_adjusted_odds'].items():
         league_info['draw'] += key * [value]
 
-    # LINE TO BE DELETED
-    print("DEBUG Penalty adjusted list", league_info['draw'])
+    # Print a Summary of the adjusted draw bag
+    print("\nSummary of the Draw Bag after adjusting for Penalties:\n", league_info['draw'])
     
     while(len(league_info['draw'])<100):
         league_info['draw'] += ['void']
 
-    print("DEBUG Penalty adjusted list with placeholders", league_info['draw'])
+    # Print a Summary of the adjusted draw bag
+    print("\nSummary of the Draw Bag after adding Voided Lots:\n", league_info['draw'])
 
     return league_info
 
@@ -233,7 +238,8 @@ def Detail_summary(league_info):
     'Number of teams in your league: ', league_info['num_teams'],'\n'
     'Number of lottery picks: ', league_info['num_lot'],'\n'
     'Number of lottery-eligible teams: ', league_info['num_lot_teams'],'\n'
-    'Summary of lottery odds: ', league_info['adjusted_odds']
+    #Future update required, the below line should be dependent on whether penalties were applied.
+    'Summary of lottery odds: ', league_info['penalized_adjusted_odds']
     )
 
 # Conduct the draw
@@ -255,7 +261,7 @@ def Draw(league_info):
         if pick in drawn:
             continue
         if not isinstance(pick, int):
-            print("\nVoid pick drawn!\n")
+            print("\nVoided Lot Drawn!\n")
             continue
 
         # Add the picked number to the list of drawn teams
